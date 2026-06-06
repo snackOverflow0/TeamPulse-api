@@ -8,9 +8,11 @@ import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
 import { ActivityModule } from './activity/activity.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { RedisModule } from './redis/redis.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, TeamModule, ProjectModule, TaskModule, ActivityModule, EventEmitterModule.forRoot()],
+  imports: [PrismaModule, AuthModule, TeamModule, ProjectModule, TaskModule, ActivityModule, EventEmitterModule.forRoot(), RedisModule, AnalyticsModule],
   controllers: [AppController],
   providers: [AppService],
 })
