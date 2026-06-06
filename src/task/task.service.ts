@@ -1,10 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TaskService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventEmitter: EventEmitter2
+  ) {}
 
   async create(userId: string, dto: CreateTaskDto) {
     const project = await this.prisma.project.findUnique({
@@ -74,7 +78,7 @@ export class TaskService {
   async update(userId: string, id: string, dto: UpdateTaskDto) {
     await this.findOne(userId, id);
 
-    return this.prisma.task.update({
+    const updatedTask = await this.prisma.task.update({
       where: { id },
       data: {
         title: dto.title,
@@ -82,7 +86,24 @@ export class TaskService {
         priority: dto.priority,
         assignedToId: dto.assignedToId,
       },
+      include: { project: true }
     });
+
+    if (dto.status === "DONE") {
+      this.eventEmitter.emit('activity.dispatched', {
+        action: 'TASK_COMPLETED',
+        userId: userId,
+        teamId: updatedTask.project.teamId
+      })
+    } else if (dto.status) {
+      this.eventEmitter.emit('activity.dispatched', {
+        action: 'TASK_CREATED',
+        userId: userId,
+        teamId: updatedTask.project.teamId
+      })
+    }
+
+    return updatedTask
   }
 
   async remove(userId: string, id: string) {

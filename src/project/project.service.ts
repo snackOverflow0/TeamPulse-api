@@ -1,10 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProjectDto, UpdateProjectDto } from './dto/project.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class ProjectService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventEmitter: EventEmitter2
+  ) {}
 
   async create(userId: string, dto: CreateProjectDto) {
     const team = await this.prisma.team.findUnique({
@@ -19,12 +23,20 @@ export class ProjectService {
       throw new ForbiddenException('You do not have permission to build a project inside this team')
     }
 
-    return this.prisma.project.create({
+    const newProject = await this.prisma.project.create({
       data: {
         name: dto.name,
         teamId: dto.teamId
       }
     })
+
+    this.eventEmitter.emit('activity.dispatched', {
+      action: 'PROJECT_CREATED',
+      userId: userId,
+      teamId: dto.teamId
+    })
+
+    return newProject
   }
 
   async findAllByTeam(userId: string, teamId: string) {
