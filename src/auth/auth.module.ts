@@ -7,6 +7,6 @@ import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
 @Module({
   imports: [PassportModule],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy]
 })
 export class AuthModule {}
