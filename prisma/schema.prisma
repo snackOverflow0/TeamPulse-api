@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 👤 USER MODEL
+// USER MODEL
 model User {
   id           String     @id @default(uuid())
   email        String     @unique
@@ -25,7 +25,7 @@ model User {
   @@map("users")
 }
 
-// 👥 TEAM MODEL
+// TEAM MODEL
 model Team {
   id        String   @id @default(uuid())
   name      String
@@ -40,7 +40,7 @@ model Team {
   @@map("teams")
 }
 
-// 📁 PROJECT MODEL
+// PROJECT MODEL
 model Project {
   id        String   @id @default(uuid())
   name      String
@@ -54,7 +54,7 @@ model Project {
   @@map("projects")
 }
 
-// 📋 TASK MODEL
+// TASK MODEL
 model Task {
   id           String   @id @default(uuid())
   title        String
@@ -72,7 +72,7 @@ model Task {
   @@map("tasks")
 }
 
-// 📣 ACTIVITY MODEL (The Heart of TeamPulse)
+// ACTIVITY MODEL
 model Activity {
   id        String   @id @default(uuid())
   action    String   // e.g., PROJECT_CREATED, TASK_COMPLETED
